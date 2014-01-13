@@ -118,7 +118,7 @@ void postData(String motion) {
         client.print("Content-Length:");
         
         //String dataj = "<Activity><DeviceID>HARDWARE44</DeviceID><Kind>" + motion + "</Kind></Activity>";
-        String dataj = "{\"DeviceID\": \"HARDWAREJSONTRUEREAL\", \"Kind\": \"" + motion + "\"}";
+        String dataj = "{\"DeviceID\": \"RealHardware\", \"Kind\": \"" + motion + "\"}";
         
         client.println(dataj.length());
         client.println();

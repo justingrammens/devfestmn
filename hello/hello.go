@@ -3,12 +3,14 @@ package main
 import (
 		"appengine"
 		"appengine/datastore"
+		"appengine/urlfetch"
         "github.com/emicklei/go-restful"
         "github.com/emicklei/go-restful/swagger"
         "net/http"
 		"log"
 		"time"
 		"github.com/kevinburke/twilio-go/twilio"
+		"appengine/memcache"
 )
 
 
@@ -17,6 +19,11 @@ type Activity struct {
 	Kind string
 	Date    time.Time
 }
+
+type Sms struct {
+	Value string
+}
+	
 
 type EventService struct {
         // normally one would use DAO (data access object)
@@ -44,6 +51,28 @@ func (u EventService) Register() {
                 Reads(Activity{})) // from the request
 				
         restful.Add(ws)
+		
+		
+		ws2 := new(restful.WebService)
+		
+        ws2.
+                Path("/sms").
+                Consumes(restful.MIME_XML, restful.MIME_JSON).
+                Produces(restful.MIME_JSON, restful.MIME_XML) // you can specify this per route as well
+
+        ws2.Route(ws.GET("").To(u.getSMSValue).
+                // docs
+                Doc("get value").
+				Reads(Sms{})) // from the request
+
+        ws2.Route(ws.PUT("/{value}").To(u.setSMSValue).
+                // docs
+                Doc("create an event").
+                Param(ws.PathParameter("value", "identifier of the user").DataType("string")).
+				Reads(Sms{})) // from the request
+				
+        restful.Add(ws2)
+		
 }
 
 
@@ -54,16 +83,71 @@ func eventKey(c appengine.Context) *datastore.Key {
 	return datastore.NewKey(c, "Collection", "default_stuff", 0, nil)
 }
 
-func sendText() {
+func sendText(request *restful.Request) {
 	const sid = "AC3ce9c81dec2c21f0664f44a2effb604e"
     const token  = "bcea6eac803c01755daa1968ac10caa5"
 	
-	client := twilio.CreateClient(sid, token, nil)
+	client := twilio.CreateClient(sid, token, nil, request.Request)
 	msg, err := client.Messages.SendMessage("+16122604503", "+16122088663", "Movement happened!", nil)
 	
 	log.Printf("MESSAGE IS: %s", msg)
 	log.Printf("err is: %s", err)
 }
+
+func (u *EventService) getSMSValue(request *restful.Request, response *restful.Response) {
+	/*c := appengine.NewContext(request.Request)
+	       
+	        sms := new(Sms)
+	        _, err := memcache.Gob.Get(c, "sms", &sms)
+	        if err != nil {
+	                response.WriteErrorString(http.StatusNotFound, "SMS value not found.")
+	        } else {
+	                response.WriteEntity(sms)
+	        }
+	*/
+	
+	
+	c := appengine.NewContext(request.Request)
+	client := urlfetch.Client(c)
+	resp, err := client.Get("http://www.google.com/")
+	if err != nil {
+	    http.Error(response, err.Error(), http.StatusInternalServerError)
+	    return
+	 }
+	 
+	 	log.Printf("WE HAVE SET THIS!!!! %s", client)
+		
+	 fmt.Fprintf(response, "HTTP GET returned status %v", resp.Status)
+				
+}
+
+func (u *EventService) setSMSValue(request *restful.Request, response *restful.Response) {
+	c := appengine.NewContext(request.Request)
+	
+	Smsobj := Sms{Value:request.PathParameter("value")}
+	
+	err := request.ReadEntity(&Smsobj)
+	 if err == nil {
+		 item := &memcache.Item{
+			 Key:   "sms",
+			 Object: &Smsobj,
+		 }
+
+		 err = memcache.Gob.Set(c, item)
+	
+		if err != nil {
+			response.WriteError(http.StatusInternalServerError, err)
+			return
+		}
+			response.WriteHeader(http.StatusCreated)
+			response.WriteEntity(Smsobj)
+		} else {
+			response.WriteError(http.StatusInternalServerError, err)
+		}
+
+}
+
+
 
 func (u *EventService) createEvent(request *restful.Request, response *restful.Response) {
         c := appengine.NewContext(request.Request)
@@ -80,7 +164,18 @@ func (u *EventService) createEvent(request *restful.Request, response *restful.R
 			response.WriteHeader(http.StatusCreated)
 	        response.WriteEntity(event)
 			
-			sendText()
+			log.Printf("SAYS THAT IT WAS CREATED????????????")
+			
+			sms := new (Sms)
+			_, err := memcache.Gob.Get(c, "sms", &sms)
+			if err == nil {
+				if sms.Value == "1" {
+					log.Println("SEND TEXT!")
+					sendText(request)
+				} else {
+					log.Println("DONT SEND TEXT!")
+				}
+			}
 			
 	    } else {
 	        response.WriteError(http.StatusInternalServerError,err2)
