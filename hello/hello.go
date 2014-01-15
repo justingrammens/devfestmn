@@ -11,6 +11,7 @@ import (
 		"time"
 		"github.com/kevinburke/twilio-go/twilio"
 		"appengine/memcache"
+		"fmt"
 )
 
 
@@ -153,7 +154,8 @@ func (u *EventService) createEvent(request *restful.Request, response *restful.R
         c := appengine.NewContext(request.Request)
 		
 	    event := Activity{}
-	    request.ReadEntity(&event)	
+	    request.ReadEntity(&event)
+		event.Date = time.Now()	
 		
 		log.Printf("HERE IS TYPER!!!")
 	
