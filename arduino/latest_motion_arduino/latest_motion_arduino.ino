@@ -10,8 +10,6 @@ Uses a WIFI shield to connect to google app engine and PUT data.
 char ssid[] = "PEKE"; //  your network SSID (name) 
 char pass[] = "jandb2005";    // your network password (use for WPA, or use as key for WEP)
 
-//int keyIndex = 0;            // your network key Index number (needed only for WEP)
-
 int pirPin = 2; //digital 2
 
 boolean testing = true;
