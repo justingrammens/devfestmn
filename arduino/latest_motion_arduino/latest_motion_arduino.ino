@@ -46,90 +46,91 @@ char server[] = "localtone-gae.appspot.com";    // name address for Google (usin
 // that you want to connect to (port 80 is default for HTTP):
 WiFiClient client;
 
-int counter = 0;
-
 void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600); 
- pinMode(pirPin, INPUT);
-     
- while (!Serial) {
+  pinMode(pirPin, INPUT);
+
+  while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
- }
-  
+  }
+
   Serial.println("Attempting to connect to WPA network...");
   Serial.print("SSID: ");
   Serial.println(ssid);
-  
+
   // check for the presence of the shield:
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present"); 
-    // don't continue:
-    //while(true);
-  } 
-  
-  status = WiFi.begin(ssid, pass);
-  delay(15000);
-   
   if (WiFi.status() == WL_NO_SHIELD) {
     Serial.println("WiFi shield not present"); 
     // don't continue:
     while(true);
   } 
-  
+
+  status = WiFi.begin(ssid, pass);
+  delay(10000);
+
   if ( status != WL_CONNECTED) { 
     Serial.println("Couldn't get a wifi connection");
     // don't do anything else:
     while(true);
   } 
   else {
-    
+
     printWifiStatus();
   }
-  
+
 }
 
 void loop() {
-  
+
   int pirVal = digitalRead(pirPin);
 
   if(pirVal == LOW){ //was motion detected
     Serial.println("Motion Detected"); 
-      postData("motion");
+
+    if (testing) {
+      Serial.println("IN TESTING MODE! Not sending to server...");
       delay(1000);
-      
-  } else {
+    } 
+    else {
+      postData("motion");
+    }
+
+  } 
+  else {
     Serial.println("no motion detected");
   }
+
   delay(2000);
 }
 
 void postData(String motion) {
-  
-   if (client.connect(server, 80)) {
-      Serial.println("connected");
-      // Make a HTTP request:
-      // Make a HTTP request:
-        client.println("PUT /events HTTP/1.1");
-        client.println("Host: localtone-gae.appspot.com");
-        client.println("User-Agent: Arduino/1.0");
-        client.println("Connection: close");
-        client.println("Content-Type: application/json");
-        client.print("Content-Length:");
-        
-        //String dataj = "<Activity><DeviceID>HARDWARE44</DeviceID><Kind>" + motion + "</Kind></Activity>";
-        String dataj = "{\"DeviceID\": \"RealHardware\", \"Kind\": \"" + motion + "\"}";
-        
-        client.println(dataj.length());
-        client.println();
-        client.println(dataj);
-     
-      Serial.println("Done posting!!!" + dataj);
-      
-    } else {
-      Serial.println("Not able to connect!!!!!!");
-    }
-      
+
+  if (client.connect(server, 80)) {
+    Serial.println("connected");
+    // Make a HTTP request:
+    // Make a HTTP request:
+    client.println("PUT /events HTTP/1.1");
+    client.println("Host: localtone-gae.appspot.com");
+    client.println("User-Agent: Arduino/1.0");
+    client.println("Connection: close");
+    client.println("Content-Type: application/json");
+    client.print("Content-Length:");
+
+    //String dataj = "<Activity><DeviceID>HARDWARE44</DeviceID><Kind>" + motion + "</Kind></Activity>";
+    String dataj = "{\"DeviceID\": \"RealHardware\", \"Kind\": \"" + motion + "\"}";
+
+    client.println(dataj.length());
+    client.println();
+    client.println(dataj);
+
+    Serial.println("Done posting!!!" + dataj);
+
+  } 
+  else {
+    Serial.println("Not able to connect!!!!!!");
+  }
+
 }
 
 
@@ -149,6 +150,7 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
+
 
 
 
