@@ -3,7 +3,7 @@ package main
 import (
 		"appengine"
 		"appengine/datastore"
-		"appengine/urlfetch"
+		//"appengine/urlfetch"
         "github.com/emicklei/go-restful"
         "github.com/emicklei/go-restful/swagger"
         "net/http"
@@ -11,7 +11,7 @@ import (
 		"time"
 		"github.com/kevinburke/twilio-go/twilio"
 		"appengine/memcache"
-		"fmt"
+		//"fmt"
 )
 
 
@@ -45,7 +45,7 @@ func (u EventService) Register() {
                 Reads(Activity{})) // from the request
 
 
-        ws.Route(ws.PUT("/{user-id}").To(u.createEvent).
+        ws.Route(ws.PUT("").To(u.createEvent).
                 // docs
                 Doc("create an event").
                 Param(ws.PathParameter("user-id", "identifier of the user").DataType("string")).
@@ -85,18 +85,18 @@ func eventKey(c appengine.Context) *datastore.Key {
 }
 
 func sendText(request *restful.Request) {
-	const sid = "AC3ce9c81dec2c21f0664f44a2effb604e"
-    const token  = "bcea6eac803c01755daa1968ac10caa5"
+	const sid = ""
+    const token  = ""
 	
 	client := twilio.CreateClient(sid, token, nil, request.Request)
-	msg, err := client.Messages.SendMessage("+16122604503", "+16122088663", "Movement happened!", nil)
+	msg, err := client.Messages.SendMessage("", "", "Movement happened!", nil)
 	
 	log.Printf("MESSAGE IS: %s", msg)
 	log.Printf("err is: %s", err)
 }
 
 func (u *EventService) getSMSValue(request *restful.Request, response *restful.Response) {
-	/*c := appengine.NewContext(request.Request)
+	c := appengine.NewContext(request.Request)
 	       
 	        sms := new(Sms)
 	        _, err := memcache.Gob.Get(c, "sms", &sms)
@@ -104,22 +104,7 @@ func (u *EventService) getSMSValue(request *restful.Request, response *restful.R
 	                response.WriteErrorString(http.StatusNotFound, "SMS value not found.")
 	        } else {
 	                response.WriteEntity(sms)
-	        }
-	*/
-	
-	
-	c := appengine.NewContext(request.Request)
-	client := urlfetch.Client(c)
-	resp, err := client.Get("http://www.google.com/")
-	if err != nil {
-	    http.Error(response, err.Error(), http.StatusInternalServerError)
-	    return
-	 }
-	 
-	 	log.Printf("WE HAVE SET THIS!!!! %s", client)
-		
-	 fmt.Fprintf(response, "HTTP GET returned status %v", resp.Status)
-				
+	        }	
 }
 
 func (u *EventService) setSMSValue(request *restful.Request, response *restful.Response) {
@@ -148,16 +133,12 @@ func (u *EventService) setSMSValue(request *restful.Request, response *restful.R
 
 }
 
-
-
 func (u *EventService) createEvent(request *restful.Request, response *restful.Response) {
         c := appengine.NewContext(request.Request)
 		
 	    event := Activity{}
 	    request.ReadEntity(&event)
 		event.Date = time.Now()	
-		
-		log.Printf("HERE IS TYPER!!!")
 	
 		key := datastore.NewIncompleteKey(c, "Activity", eventKey(c))
 		_, err2 := datastore.Put(c, key, &event)
