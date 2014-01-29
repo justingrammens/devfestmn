@@ -87,7 +87,7 @@ func sendText(request *restful.Request) {
 	const sid = "AC3ce9c81dec2c21f0664f44a2effb604e"
     const token  = "bcea6eac803c01755daa1968ac10caa5"
 	
-	client := twilio.CreateClient(sid, token, nil, request.Request)
+	client := twilio.CreateClient(sid, token, nil)
 	msg, err := client.Messages.SendMessage("+16122604503", "+16122088663", "Movement happened!", nil)
 	
 	log.Printf("MESSAGE IS: %s", msg)
@@ -117,7 +117,7 @@ func (u *EventService) getSMSValue(request *restful.Request, response *restful.R
 	 
 	 	log.Printf("WE HAVE SET THIS!!!! %s", client)
 		
-	 fmt.Fprintf(response, "HTTP GET returned status %v", resp.Status)
+	 log.Printf("HTTP GET returned status %d", resp.Status)
 				
 }
 
@@ -155,7 +155,7 @@ func (u *EventService) createEvent(request *restful.Request, response *restful.R
 	    event := Activity{}
 	    request.ReadEntity(&event)	
 		
-		log.Printf("HERE IS TYPER!!!")
+		log.Printf("HERE IS TYPER!!! %s", event)
 	
 		key := datastore.NewIncompleteKey(c, "Activity", eventKey(c))
 		_, err2 := datastore.Put(c, key, &event)
