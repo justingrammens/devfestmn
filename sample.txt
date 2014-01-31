@@ -10,3 +10,42 @@ PUT:
 http://localtone-gae.appspot.com/events
 Content-type: application/json
 {"DeviceID": "RealHardware", "Kind": "motion"}
+
+
+=== local ===
+
+http://localhost:8080/apidocs.json
+
+http://localhost:8080/events/1
+Content-type: application/json
+
+{
+    "DeviceId": "1",
+    "Kind": "Motion"
+}
+
+http://localhost:8000/instances
+
+
+
+
+---
+
+	*/
+	
+	
+	c := appengine.NewContext(request.Request)
+	client := urlfetch.Client(c)
+	resp, err := client.Get("http://www.google.com/")
+	if err != nil {
+	    http.Error(response, err.Error(), http.StatusInternalServerError)
+	    return
+	 }
+	 
+	 	log.Printf("WE HAVE SET THIS!!!! %s", client)
+		
+	 log.Printf("HTTP GET returned status %d", resp.Status)
+				
+=======
+	        }	
+>>>>>>> 2ae8b8b82ff5747d4ec2336b01067d1a21c8abe6
