@@ -3,7 +3,7 @@ package main
 import (
 	"appengine"
 	"appengine/datastore"
-	//"appengine/urlfetch"
+	"appengine/urlfetch"
 	"appengine/memcache"
 	"github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
@@ -11,7 +11,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"github.com/stathat/jconfig"
+//	"github.com/stathat/jconfig"
 	//"fmt"
 )
 
@@ -78,6 +78,34 @@ func eventKey(c appengine.Context) *datastore.Key {
 	// The string "default_guestbook" here could be varied to have multiple guestbooks.
 	//return datastore.NewKey(c, "Justin", "default_justin", 0, nil)
 	return datastore.NewKey(c, "Collection", "default_stuff", 0, nil)
+}
+
+func postToTwilio() {
+	formValues := url.Values{}
+	
+	const twilioAccountSid = "AC3ce9c81dec2c21f0664f44a2effb604e"
+	const twilioAuthToken  = "ef1af2dfa56f30c826ed057c37061aea"
+	
+	  formValues.Set("Body", "Motion detected")
+	  formValues.Set("From", "+16122604503")
+	  formValues.Set("To", "+16122088663")
+
+	  req, err := http.NewRequest("POST", "https://api.twilio.com/2010-04-01/Accounts/AC3ce9c81dec2c21f0664f44a2effb604e/SMS/Messages.json", strings.NewReader(formValues.Encode()))
+	  if err != nil {
+	    return err
+	  }
+
+	  req.SetBasicAuth(twilioAccountSid, twilioAuthToken)
+	  req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	  client := urlfetch.Client(c)
+	  resp, err := client.Do(req)
+	  defer resp.Body.Close()
+	  if err != nil {
+	    return err
+	  }
+
+	  _, err = ioutil.ReadAll(resp.Body)
 }
 
 func sendText(request *restful.Request) {
@@ -160,7 +188,8 @@ func (u *EventService) createEvent(request *restful.Request, response *restful.R
 		if err == nil {
 			if sms.Value == "1" {
 				log.Println("SEND TEXT!")
-				sendText(request)
+				//sendText(request)
+				postToTwilio()
 			} else {
 				log.Println("DONT SEND TEXT!")
 			}
