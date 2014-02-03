@@ -7,8 +7,8 @@ Uses a WIFI shield to connect to google app engine and PUT data.
 #include <WiFi.h>
 #include <Time.h>
 
-char ssid[] = "PEKE"; //  your network SSID (name) 
-char pass[] = "jandb2005";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = ""; //  your network SSID (name) 
+char pass[] = "";    // your network password (use for WPA, or use as key for WEP)
 
 int pirPin = 2; //digital 2
 
@@ -16,8 +16,7 @@ boolean testing = true;
 
 int status = WL_IDLE_STATUS;
 
-//IPAddress server(74,125,192,141);  // numeric IP (if you want to go direct)
-char server[] = "localtone-gae.appspot.com";    // name address using DNS
+char server[] = "";    // name address using DNS
 
 // Initialize the Ethernet client library
 WiFiClient client;
@@ -80,13 +79,12 @@ void postData(String motion) {
   if (client.connect(server, 80)) {
     Serial.println("connected");
     client.println("POST /events HTTP/1.1");
-    client.println("Host: localtone-gae.appspot.com");
+    client.println("Host: YOUR-HOST");
     client.println("User-Agent: Arduino/1.0");
     client.println("Connection: close");
     client.println("Content-Type: application/json");
     client.print("Content-Length:");
 
-    //String dataj = "<Activity><DeviceID>HARDWARE44</DeviceID><Kind>" + motion + "</Kind></Activity>";
     String dataj = "{\"DeviceID\": \"RealHardware\", \"Kind\": \"" + motion + "\"}";
 
     client.println(dataj.length());
