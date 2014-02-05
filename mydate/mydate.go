@@ -7,7 +7,7 @@ func Birthdate() time.Time {
 	return d
 }
 
-func addsub(x, y int) (sum, difference int) {
+func AddandSub(x, y int) (sum, difference int) {
 	sum = x + y
 	difference = x - y
 	return
