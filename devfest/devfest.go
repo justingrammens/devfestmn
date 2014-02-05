@@ -47,12 +47,12 @@ func (u EventService) Register() {
 
 	ws.Route(ws.GET("").To(u.getAllEvents).
 		// docs
-		Doc("update a user").
+		Doc("GET the events").
 		Reads(Activity{})) // from the request
 
 	ws.Route(ws.POST("").To(u.createEvent).
 		// docs
-		Doc("create an event").
+		Doc("POST an event").
 		Param(ws.PathParameter("user-id", "identifier of the user").DataType("string")).
 		Reads(Activity{})) // from the request
 
@@ -67,12 +67,12 @@ func (u EventService) Register() {
 
 	ws2.Route(ws2.GET("").To(u.getSMSValue).
 		// docs
-		Doc("get value").
+		Doc("GET sms value").
 		Reads(Sms{})) // from the request
 
 	ws2.Route(ws2.PUT("").To(u.setSMSValue).
 		// docs
-		Doc("create an event").
+		Doc("PUT an event").
 		Param(ws2.PathParameter("value", "identifier of the user").DataType("string")).
 		Reads(Sms{})) // from the request
 
