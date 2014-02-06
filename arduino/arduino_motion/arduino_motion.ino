@@ -16,7 +16,7 @@ boolean testing = true;
 
 int status = WL_IDLE_STATUS;
 
-char server[] = "";    // name address using DNS
+char server[] = "GOOGLE";    // name address using DNS
 
 // Initialize the Ethernet client library
 WiFiClient client;
