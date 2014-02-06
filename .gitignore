@@ -3,4 +3,4 @@ config.json
 sample.txt
 
 #arduino code
-arduino/latest_motion_arduino/latest_motion_arduino.ino
+arduino/arduino_motion/arduino_motion.ino
