@@ -1,15 +1,23 @@
+== Events ==
+
 GET: http://localtone-gae.appspot.com/events
 
-PUT:
-
-http://localtone-gae.appspot.com/sms/1
-Content-type: application/json
-data: {}
-
-PUT:
+POST:
 http://localtone-gae.appspot.com/events
 Content-type: application/json
-{"DeviceID": "RealHardware", "Kind": "motion"}
+{"DeviceID": "Arduino", "Kind": "motion"}
+
+
+== SMS ==
+
+PUT:
+http://localtone-gae.appspot.com/sms
+Content-type: application/json
+data: { "Value": "1" }
+
+http://localtone-gae.appspot.com/sms
+Content-type: application/json
+data: { "Value": "0" }
 
 
 === local ===
@@ -20,7 +28,7 @@ http://localhost:8080/events/1
 Content-type: application/json
 
 {
-    "DeviceId": "1",
+    "DeviceId": "Arduino",
     "Kind": "Motion"
 }
 
