@@ -1,59 +1,30 @@
+Sample REST calls
+
+== API Docs ==
+
+http://localhost:8080/apidocs.json
+
+
 == Events ==
 
-GET: http://localtone-gae.appspot.com/events
+GET: http://localhost:8080/events
 
 POST:
 http://localtone-gae.appspot.com/events
 Content-type: application/json
-{"DeviceID": "Arduino", "Kind": "motion"}
-
-
-== SMS ==
-
-PUT:
-http://localtone-gae.appspot.com/sms
-Content-type: application/json
-data: { "Value": "1" }
-
-http://localtone-gae.appspot.com/sms
-Content-type: application/json
-data: { "Value": "0" }
-
-
-=== local ===
-
-http://localhost:8080/apidocs.json
-
-http://localhost:8080/events/1
-Content-type: application/json
-
 {
     "DeviceId": "Arduino",
     "Kind": "Motion"
 }
 
-http://localhost:8000/instances
+== SMS ==
 
+PUT:
+http://localhost:8080/sms
+Content-type: application/json
+data: { "Value": "1" }
 
+http://localhost:8080/sms
+Content-type: application/json
+data: { "Value": "0" }
 
-
----
-
-	*/
-	
-	
-	c := appengine.NewContext(request.Request)
-	client := urlfetch.Client(c)
-	resp, err := client.Get("http://www.google.com/")
-	if err != nil {
-	    http.Error(response, err.Error(), http.StatusInternalServerError)
-	    return
-	 }
-	 
-	 	log.Printf("WE HAVE SET THIS!!!! %s", client)
-		
-	 log.Printf("HTTP GET returned status %d", resp.Status)
-				
-=======
-	        }	
->>>>>>> 2ae8b8b82ff5747d4ec2336b01067d1a21c8abe6
